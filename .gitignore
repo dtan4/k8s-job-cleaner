@@ -18,3 +18,7 @@
 .glide/
 
 # End of https://www.gitignore.io/api/go
+
+/bin
+/dist
+/coverage.txt
