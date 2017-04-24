@@ -43,6 +43,11 @@ func main() {
 	flags.StringVar(&namespace, "namespace", "", "Kubernetes namespace")
 	flags.BoolVarP(&version, "version", "v", false, "Print version")
 
+	if labelGroup == "" {
+		fmt.Fprintln(os.Stderr, "--label-group must be set")
+		os.Exit(1)
+	}
+
 	if kubeconfig == "" {
 		if os.Getenv("KUBECONFIG") != "" {
 			kubeconfig = os.Getenv("KUBECONFIG")
