@@ -1,5 +1,7 @@
 # k8s-job-cleaner
 
+[![Build Status](https://travis-ci.org/dtan4/k8s-job-cleaner.svg?branch=master)](https://travis-ci.org/dtan4/k8s-job-cleaner)
+
 Clean up succeeded Kubernetes Jobs
 
 ```bash
