@@ -39,7 +39,7 @@ func main() {
 	flags.BoolVar(&inCluster, "in-cluster", false, "Execute in Kubernetes cluster")
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path of kubeconfig")
 	flags.StringVar(&labelGroup, "label-group", "", "Label name for grouping Jobs")
-	flags.Int64Var(&maxCount, "max-count", int64(defaultMaxCount), "Number of pod to remain")
+	flags.Int64Var(&maxCount, "max-count", int64(defaultMaxCount), "Number of Jobs to remain")
 	flags.StringVar(&namespace, "namespace", "", "Kubernetes namespace")
 	flags.BoolVarP(&version, "version", "v", false, "Print version")
 
