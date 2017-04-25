@@ -1,5 +1,5 @@
-hash: 2e67f0a71fd55414915b143f38d55dbff4883269b525a7cb5a99f56ae814c62a
-updated: 2017-04-24T19:55:46.135756009+09:00
+hash: 35b6ae58b897d62c7275f0bc6bde820bb572b6db6697839a77c9bb59d66976c3
+updated: 2017-04-25T11:01:51.788975685+09:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -75,6 +75,8 @@ imports:
   - jwriter
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
+- name: github.com/pkg/errors
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/PuerkitoBio/purell
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
 - name: github.com/PuerkitoBio/urlesc

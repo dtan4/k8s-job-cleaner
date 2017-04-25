@@ -1,8 +1,7 @@
 package kubernetes
 
 import (
-	"errors"
-
+	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api/v1"
 	batchv1 "k8s.io/client-go/pkg/apis/batch/v1"
@@ -34,12 +33,12 @@ func NewClient(kubeconfig, context string) (*Client, error) {
 
 	config, err := clientConfig.ClientConfig()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "falied to load local kubeconfig")
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to load clientset")
 	}
 
 	return &Client{
@@ -52,12 +51,12 @@ func NewClient(kubeconfig, context string) (*Client, error) {
 func NewClientInCluster() (*Client, error) {
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to load kubeconfig in cluster")
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "falied to load clientset")
 	}
 
 	return &Client{
@@ -68,7 +67,7 @@ func NewClientInCluster() (*Client, error) {
 // DeleteJob deletes the given Job
 func (c *Client) DeleteJob(job batchv1.Job) error {
 	if err := c.clientset.BatchV1().Jobs(job.Namespace).Delete(job.Name, &v1.DeleteOptions{}); err != nil {
-		return err
+		return errors.Wrap(err, "failed to delete Job")
 	}
 
 	return nil
@@ -77,7 +76,7 @@ func (c *Client) DeleteJob(job batchv1.Job) error {
 // DeletePod deletes the given Pod
 func (c *Client) DeletePod(pod v1.Pod) error {
 	if err := c.clientset.Core().Pods(pod.Namespace).Delete(pod.Name, &v1.DeleteOptions{}); err != nil {
-		return err
+		return errors.Wrap(err, "failed to delete Pod")
 	}
 
 	return nil
@@ -87,7 +86,7 @@ func (c *Client) DeletePod(pod v1.Pod) error {
 func (c *Client) ListJobs(namespace string) (*batchv1.JobList, error) {
 	jobs, err := c.clientset.BatchV1().Jobs(namespace).List(v1.ListOptions{})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to retrieve Jobs")
 	}
 
 	return jobs, nil
@@ -97,7 +96,7 @@ func (c *Client) ListJobs(namespace string) (*batchv1.JobList, error) {
 func (c *Client) ListPods(namespace string) (*v1.PodList, error) {
 	pods, err := c.clientset.Core().Pods(namespace).List(v1.ListOptions{})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to retrieve Pods")
 	}
 
 	return pods, nil
@@ -111,7 +110,7 @@ func (c *Client) NamespaceInConfig() (string, error) {
 
 	rawConfig, err := c.clientConfig.RawConfig()
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed to load rawConfig")
 	}
 
 	return rawConfig.Contexts[rawConfig.CurrentContext].Namespace, nil
