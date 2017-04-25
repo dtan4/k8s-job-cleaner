@@ -16,6 +16,16 @@ type Client struct {
 	clientset    *kubernetes.Clientset
 }
 
+// DefaultConfigFile returns the default kubeconfig file path
+func DefaultConfigFile() string {
+	return clientcmd.RecommendedHomeFile
+}
+
+// DefaultNamespace returns the default namespace
+func DefaultNamespace() string {
+	return v1.NamespaceAll
+}
+
 // NewClient creates Client object using local kubecfg
 func NewClient(kubeconfig, context string) (*Client, error) {
 	clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(

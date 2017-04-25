@@ -7,13 +7,10 @@ import (
 
 	k8s "github.com/dtan4/k8s-job-cleaner/kubernetes"
 	flag "github.com/spf13/pflag"
-	"k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 const (
-	defaultMaxCount  = 10
-	defaultNamespace = v1.NamespaceAll
+	defaultMaxCount = 10
 )
 
 func main() {
@@ -51,7 +48,7 @@ func main() {
 		if os.Getenv("KUBECONFIG") != "" {
 			kubeconfig = os.Getenv("KUBECONFIG")
 		} else {
-			kubeconfig = clientcmd.RecommendedHomeFile
+			kubeconfig = k8s.DefaultConfigFile()
 		}
 	}
 
@@ -75,7 +72,7 @@ func main() {
 		}
 
 		if namespace == "" {
-			namespace = defaultNamespace
+			namespace = k8s.DefaultNamespace()
 		}
 
 		client = c
@@ -94,7 +91,7 @@ func main() {
 			}
 
 			if namespaceInConfig == "" {
-				namespace = defaultNamespace
+				namespace = k8s.DefaultNamespace()
 			} else {
 				namespace = namespaceInConfig
 			}
