@@ -1,6 +1,7 @@
-package main
+package kubernetes
 
 import (
+	"k8s.io/client-go/pkg/api/v1"
 	batchv1 "k8s.io/client-go/pkg/apis/batch/v1"
 )
 
@@ -21,3 +22,8 @@ func (j Jobs) Less(m, n int) bool {
 func (j Jobs) Swap(m, n int) {
 	j[m], j[n] = j[n], j[m]
 }
+
+// Jobs represents job list
+type Pods []v1.Pod
+
+// Sorting Pods is not necessary

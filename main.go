@@ -11,6 +11,7 @@ import (
 
 const (
 	defaultMaxCount = 10
+	jobNameLabel    = "job-name"
 )
 
 func main() {
@@ -106,7 +107,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	jobGroup := map[string]Jobs{}
+	jobGroup := map[string]k8s.Jobs{}
 
 	for _, job := range jobs.Items {
 		if job.Status.Succeeded == 0 {
@@ -119,10 +120,35 @@ func main() {
 		}
 
 		if jobGroup[label] == nil {
-			jobGroup[label] = Jobs{}
+			jobGroup[label] = k8s.Jobs{}
 		}
 
 		jobGroup[label] = append(jobGroup[label], job)
+	}
+
+	pods, err := client.ListPods(namespace)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	podGroup := map[string]k8s.Pods{}
+
+	for _, pod := range pods.Items {
+		if !k8s.IsPodFinished(pod) {
+			continue
+		}
+
+		label := pod.Labels[jobNameLabel]
+		if label == "" {
+			continue
+		}
+
+		if podGroup[label] == nil {
+			podGroup[label] = k8s.Pods{}
+		}
+
+		podGroup[label] = append(podGroup[label], pod)
 	}
 
 	for _, jobs := range jobGroup {
@@ -142,6 +168,18 @@ func main() {
 				if err := client.DeleteJob(job); err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					os.Exit(1)
+				}
+			}
+
+			for _, pod := range podGroup[job.Name] {
+				if dryRun {
+					fmt.Printf("  Deleting Pod %s... [dry-run]\n", pod.Name)
+				} else {
+					fmt.Printf("  Deleting Pod %s...\n", pod.Name)
+					if err := client.DeletePod(pod); err != nil {
+						fmt.Fprintln(os.Stderr, err)
+						os.Exit(1)
+					}
 				}
 			}
 		}
