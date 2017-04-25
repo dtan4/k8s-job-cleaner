@@ -42,8 +42,8 @@ func main() {
 	flags.StringVar(&namespace, "namespace", "", "Kubernetes namespace")
 	flags.BoolVarP(&version, "version", "v", false, "Print version")
 
-	if labelGroup == "" {
-		fmt.Fprintln(os.Stderr, "--label-group must be set")
+	if err := flags.Parse(os.Args[1:]); err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
@@ -55,8 +55,8 @@ func main() {
 		}
 	}
 
-	if err := flags.Parse(os.Args[1:]); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+	if labelGroup == "" {
+		fmt.Fprintln(os.Stderr, "--label-group must be set")
 		os.Exit(1)
 	}
 
