@@ -5,10 +5,9 @@ import (
 	"os"
 	"sort"
 
+	k8s "github.com/dtan4/k8s-job-cleaner/kubernetes"
 	flag "github.com/spf13/pflag"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -66,10 +65,10 @@ func main() {
 		os.Exit(0)
 	}
 
-	var config *rest.Config
+	var client *k8s.Client
 
 	if inCluster {
-		c, err := rest.InClusterConfig()
+		c, err := k8s.NewClientInCluster()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -79,42 +78,32 @@ func main() {
 			namespace = defaultNamespace
 		}
 
-		config = c
+		client = c
 	} else {
-		clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-			&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeconfig},
-			&clientcmd.ConfigOverrides{CurrentContext: context})
-
-		c, err := clientConfig.ClientConfig()
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-
-		rawConfig, err := clientConfig.RawConfig()
+		c, err := k8s.NewClient(kubeconfig, context)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
 		if namespace == "" {
-			if rawConfig.Contexts[rawConfig.CurrentContext].Namespace == "" {
+			namespaceInConfig, err := c.NamespaceInConfig()
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
+
+			if namespaceInConfig == "" {
 				namespace = defaultNamespace
 			} else {
-				namespace = rawConfig.Contexts[rawConfig.CurrentContext].Namespace
+				namespace = namespaceInConfig
 			}
 		}
 
-		config = c
+		client = c
 	}
 
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-
-	jobs, err := clientset.BatchV1().Jobs(namespace).List(v1.ListOptions{})
+	jobs, err := client.ListJobs(namespace)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -153,7 +142,7 @@ func main() {
 				fmt.Printf("Deleting Job %s... [dry-run]\n", job.Name)
 			} else {
 				fmt.Printf("Deleting Job %s...\n", job.Name)
-				if err := clientset.BatchV1().Jobs(job.Namespace).Delete(job.Name, &v1.DeleteOptions{}); err != nil {
+				if err := client.DeleteJob(job); err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					os.Exit(1)
 				}
