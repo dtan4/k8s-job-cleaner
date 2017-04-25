@@ -5,6 +5,12 @@
 
 Clean up succeeded Kubernetes Jobs
 
+## What is this?
+
+This tool provides Job cleaning feature based on k8s 1.6's [Job History Limits](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#jobs-history-limits).
+
+For example, following command deletes completed Jobs and attached Pods, but leaves the last 10 Jobs per `job` label.
+
 ```bash
 $ k8s-job-cleaner --label-group job --max-count 10
 ```
@@ -15,7 +21,28 @@ Kubernetes 1.3 or above
 
 ## Installation
 
-TBD
+### From source
+
+```bash
+$ go get -d github.com/dtan4/k8s-job-cleaner
+$ cd $GOPATH/src/github.com/dtan4/k8s-job-cleaner
+$ make deps
+$ make install
+```
+
+### Run in a Docker container
+
+Docker image is available at [quay.io/dtan4/k8s-job-cleaner](https://quay.io/repository/dtan4/k8s-job-cleaner).
+
+```bash
+# -t is required to colorize logs
+$ docker run \
+    --rm \
+    -t \
+    -v $HOME/.kube/config:/.kube/config \
+    quay.io/dtan4/k8s-job-cleaner:latest \
+      --label-group job
+```
 
 ## Usage
 
@@ -27,7 +54,48 @@ Just add `--in-cluster` flag.
 $ k8s-job-cleaner --label-group job --max-count 10 --in-cluster
 ```
 
-(TBD: CronJob manifest sample)
+CronJob manifest sample:
+
+```yaml
+apiVersion: batch/v2alpha1
+kind: CronJob
+metadata:
+  name: k8s-job-cleaner
+  labels:
+    job: k8s-job-cleaner
+    role: job
+spec:
+  schedule: "0 * * * *"
+  startingDeadlineSeconds: 30
+  concurrencyPolicy: Allow
+  suspend: false
+  jobTemplate:
+    metadata:
+      name: k8s-job-cleaner
+      labels:
+        job: k8s-job-cleaner
+        role: job
+    spec:
+      template:
+        metadata:
+          name: k8s-job-cleaner
+          labels:
+            job: k8s-job-cleaner
+            role: job
+        spec:
+          containers:
+          - name: k8s-job-cleaner
+            image: quay.io/dtan4/k8s-job-cleaner:latest
+            imagePullPolicy: Always
+            command:
+              - "/k8s-job-cleaner"
+              - "--in-cluster"
+              - "--label-group"
+              - "job"
+              - "--max-count"
+              - "20"
+          restartPolicy: Never
+```
 
 ### Local machine
 
