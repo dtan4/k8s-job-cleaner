@@ -1,5 +1,8 @@
 # k8s-job-cleaner
 
+[![Build Status](https://travis-ci.org/dtan4/k8s-job-cleaner.svg?branch=master)](https://travis-ci.org/dtan4/k8s-job-cleaner)
+[![Docker Repository on Quay](https://quay.io/repository/dtan4/k8s-job-cleaner/status "Docker Repository on Quay")](https://quay.io/repository/dtan4/k8s-job-cleaner)
+
 Clean up succeeded Kubernetes Jobs
 
 ```bash
