@@ -15,21 +15,6 @@ type Client struct {
 	clientset    *kubernetes.Clientset
 }
 
-// DefaultConfigFile returns the default kubeconfig file path
-func DefaultConfigFile() string {
-	return clientcmd.RecommendedHomeFile
-}
-
-// DefaultNamespace returns the default namespace
-func DefaultNamespace() string {
-	return v1.NamespaceAll
-}
-
-// IsPodFinished returns whether the given Pod has finished or has not
-func IsPodFinished(pod v1.Pod) bool {
-	return pod.Status.Phase == v1.PodSucceeded || pod.Status.Phase == v1.PodFailed
-}
-
 // NewClient creates Client object using local kubecfg
 func NewClient(kubeconfig, context string) (*Client, error) {
 	clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(

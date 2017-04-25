@@ -110,7 +110,7 @@ func main() {
 	jobGroup := map[string]k8s.Jobs{}
 
 	for _, job := range jobs.Items {
-		if job.Status.Succeeded == 0 {
+		if !k8s.IsJobFinished(job) {
 			continue
 		}
 
