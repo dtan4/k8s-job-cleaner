@@ -5,7 +5,16 @@ import (
 
 	"k8s.io/client-go/pkg/api/v1"
 	batchv1 "k8s.io/client-go/pkg/apis/batch/v1"
+	"k8s.io/client-go/tools/clientcmd"
 )
+
+func TestDefaultConfigFile(t *testing.T) {
+	expected := clientcmd.RecommendedHomeFile
+
+	if got := DefaultConfigFile(); got != expected {
+		t.Errorf("wrong result: expected: %q, got: %q", expected, got)
+	}
+}
 
 func TestIsJobFinished(t *testing.T) {
 	testcases := []struct {
