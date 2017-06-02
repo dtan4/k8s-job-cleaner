@@ -16,6 +16,14 @@ func TestDefaultConfigFile(t *testing.T) {
 	}
 }
 
+func TestDefaultNamespace(t *testing.T) {
+	expected := v1.NamespaceAll
+
+	if got := DefaultNamespace(); got != expected {
+		t.Errorf("wrong result: expected: %q, got: %q", expected, got)
+	}
+}
+
 func TestIsJobFinished(t *testing.T) {
 	testcases := []struct {
 		job      batchv1.Job
