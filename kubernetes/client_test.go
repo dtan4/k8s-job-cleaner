@@ -59,3 +59,54 @@ func TestDeleteJob(t *testing.T) {
 		}
 	}
 }
+
+func TestDeletePod(t *testing.T) {
+	obj := &v1.Pod{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "pod",
+			Namespace: "namespace",
+		},
+	}
+	clientset := fake.NewSimpleClientset(obj)
+	client := &Client{
+		clientset: clientset,
+	}
+
+	testcases := []struct {
+		pod        v1.Pod
+		errMessage string
+	}{
+		{
+			pod: v1.Pod{
+				ObjectMeta: v1.ObjectMeta{
+					Name:      "pod",
+					Namespace: "namespace",
+				},
+			},
+			errMessage: "",
+		},
+		{
+			pod: v1.Pod{
+				ObjectMeta: v1.ObjectMeta{
+					Name:      "foobar",
+					Namespace: "namespace",
+				},
+			},
+			errMessage: "failed to delete Pod",
+		},
+	}
+
+	for _, testcase := range testcases {
+		err := client.DeletePod(testcase.pod)
+
+		if testcase.errMessage == "" {
+			if err != nil {
+				t.Errorf("error should not be raised: %s", err)
+			}
+		} else {
+			if !strings.Contains(err.Error(), testcase.errMessage) {
+				t.Errorf("error message does not contain %q; got: %q", testcase.errMessage, err.Error())
+			}
+		}
+	}
+}
