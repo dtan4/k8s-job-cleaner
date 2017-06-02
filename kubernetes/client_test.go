@@ -21,46 +21,30 @@ func TestDeleteJob(t *testing.T) {
 		clientset: clientset,
 	}
 
-	testcases := []struct {
-		job        batchv1.Job
-		errMessage string
-	}{
-		{
-			job: batchv1.Job{
-				ObjectMeta: v1.ObjectMeta{
-					Name:      "job",
-					Namespace: "namespace",
-				},
-			},
-			errMessage: "",
+	if err := client.DeleteJob(batchv1.Job{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "job",
+			Namespace: "namespace",
 		},
-		{
-			job: batchv1.Job{
-				ObjectMeta: v1.ObjectMeta{
-					Name:      "foobar",
-					Namespace: "namespace",
-				},
-			},
-			errMessage: "failed to delete Job",
-		},
+	}); err != nil {
+		t.Errorf("error should not be raised: %s", err)
 	}
 
-	for _, testcase := range testcases {
-		err := client.DeleteJob(testcase.job)
+	err := client.DeleteJob(batchv1.Job{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "foobar",
+			Namespace: "namespace",
+		},
+	})
 
-		if testcase.errMessage == "" {
-			if err != nil {
-				t.Errorf("error should not be raised: %s", err)
-			}
-		} else {
-			if err == nil {
-				t.Errorf("error should be raised")
-			}
+	if err == nil {
+		t.Errorf("error should be raised")
+	}
 
-			if !strings.Contains(err.Error(), testcase.errMessage) {
-				t.Errorf("error message does not contain %q; got: %q", testcase.errMessage, err.Error())
-			}
-		}
+	expected := "failed to delete Job"
+
+	if !strings.Contains(err.Error(), expected) {
+		t.Errorf("error message does not contain %q; got: %q", expected, err.Error())
 	}
 }
 
@@ -76,46 +60,30 @@ func TestDeletePod(t *testing.T) {
 		clientset: clientset,
 	}
 
-	testcases := []struct {
-		pod        v1.Pod
-		errMessage string
-	}{
-		{
-			pod: v1.Pod{
-				ObjectMeta: v1.ObjectMeta{
-					Name:      "pod",
-					Namespace: "namespace",
-				},
-			},
-			errMessage: "",
+	if err := client.DeletePod(v1.Pod{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "pod",
+			Namespace: "namespace",
 		},
-		{
-			pod: v1.Pod{
-				ObjectMeta: v1.ObjectMeta{
-					Name:      "foobar",
-					Namespace: "namespace",
-				},
-			},
-			errMessage: "failed to delete Pod",
-		},
+	}); err != nil {
+		t.Errorf("error should not be raised: %s", err)
 	}
 
-	for _, testcase := range testcases {
-		err := client.DeletePod(testcase.pod)
+	err := client.DeletePod(v1.Pod{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "foobar",
+			Namespace: "namespace",
+		},
+	})
 
-		if testcase.errMessage == "" {
-			if err != nil {
-				t.Errorf("error should not be raised: %s", err)
-			}
-		} else {
-			if err == nil {
-				t.Errorf("error should be raised")
-			}
+	if err == nil {
+		t.Errorf("error should be raised")
+	}
 
-			if !strings.Contains(err.Error(), testcase.errMessage) {
-				t.Errorf("error message does not contain %q; got: %q", testcase.errMessage, err.Error())
-			}
-		}
+	expected := "failed to delete Pod"
+
+	if !strings.Contains(err.Error(), expected) {
+		t.Errorf("error message does not contain %q; got: %q", expected, err.Error())
 	}
 }
 
@@ -148,41 +116,28 @@ func TestListJobs(t *testing.T) {
 	}
 
 	testcases := []struct {
-		namespace  string
-		expected   int
-		errMessage string
+		namespace string
+		expected  int
 	}{
 		{
-			namespace:  "namespace",
-			expected:   2,
-			errMessage: "",
+			namespace: "namespace",
+			expected:  2,
 		},
 		{
-			namespace:  "foobar",
-			expected:   0,
-			errMessage: "",
+			namespace: "foobar",
+			expected:  0,
 		},
 	}
 
 	for _, testcase := range testcases {
 		jobs, err := client.ListJobs(testcase.namespace)
 
-		if testcase.errMessage == "" {
-			if err != nil {
-				t.Errorf("error should not be raised: %s", err)
-			}
+		if err != nil {
+			t.Errorf("error should not be raised: %s", err)
+		}
 
-			if len(jobs.Items) != testcase.expected {
-				t.Errorf("the number of items does not match; expected: %d, got: %v", testcase.expected, jobs)
-			}
-		} else {
-			if err == nil {
-				t.Errorf("error should be raised")
-			}
-
-			if !strings.Contains(err.Error(), testcase.errMessage) {
-				t.Errorf("error message does not contain %q; got: %q", testcase.errMessage, err.Error())
-			}
+		if len(jobs.Items) != testcase.expected {
+			t.Errorf("the number of items does not match; expected: %d, got: %v", testcase.expected, jobs)
 		}
 	}
 }
