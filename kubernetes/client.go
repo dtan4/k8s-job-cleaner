@@ -12,7 +12,7 @@ import (
 // Client represents the wrapper of Kubernetes API client
 type Client struct {
 	clientConfig clientcmd.ClientConfig
-	clientset    *kubernetes.Clientset
+	clientset    kubernetes.Interface
 }
 
 // NewClient creates Client object using local kubecfg
