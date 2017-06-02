@@ -141,3 +141,58 @@ func TestListJobs(t *testing.T) {
 		}
 	}
 }
+
+func TestListPods(t *testing.T) {
+	obj := &v1.PodList{
+		Items: []v1.Pod{
+			v1.Pod{
+				ObjectMeta: v1.ObjectMeta{
+					Name:      "pod1",
+					Namespace: "namespace",
+				},
+			},
+			v1.Pod{
+				ObjectMeta: v1.ObjectMeta{
+					Name:      "pod2",
+					Namespace: "namespace",
+				},
+			},
+			v1.Pod{
+				ObjectMeta: v1.ObjectMeta{
+					Name:      "pod3",
+					Namespace: "namespace-foobar",
+				},
+			},
+		},
+	}
+	clientset := fake.NewSimpleClientset(obj)
+	client := &Client{
+		clientset: clientset,
+	}
+
+	testcases := []struct {
+		namespace string
+		expected  int
+	}{
+		{
+			namespace: "namespace",
+			expected:  2,
+		},
+		{
+			namespace: "foobar",
+			expected:  0,
+		},
+	}
+
+	for _, testcase := range testcases {
+		jobs, err := client.ListPods(testcase.namespace)
+
+		if err != nil {
+			t.Errorf("error should not be raised: %s", err)
+		}
+
+		if len(jobs.Items) != testcase.expected {
+			t.Errorf("the number of items does not match; expected: %d, got: %v", testcase.expected, jobs)
+		}
+	}
+}
