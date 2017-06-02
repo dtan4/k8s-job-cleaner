@@ -44,3 +44,53 @@ func TestIsJobFinished(t *testing.T) {
 		}
 	}
 }
+
+func TestIsPodFinished(t *testing.T) {
+	testcases := []struct {
+		pod      v1.Pod
+		expected bool
+	}{
+		{
+			pod: v1.Pod{
+				ObjectMeta: v1.ObjectMeta{
+					Name:      "pod-success",
+					Namespace: "namespace",
+				},
+				Status: v1.PodStatus{
+					Phase: v1.PodSucceeded,
+				},
+			},
+			expected: true,
+		},
+		{
+			pod: v1.Pod{
+				ObjectMeta: v1.ObjectMeta{
+					Name:      "pod-failed",
+					Namespace: "namespace",
+				},
+				Status: v1.PodStatus{
+					Phase: v1.PodFailed,
+				},
+			},
+			expected: true,
+		},
+		{
+			pod: v1.Pod{
+				ObjectMeta: v1.ObjectMeta{
+					Name:      "pod-failed",
+					Namespace: "namespace",
+				},
+				Status: v1.PodStatus{
+					Phase: v1.PodRunning,
+				},
+			},
+			expected: false,
+		},
+	}
+
+	for _, testcase := range testcases {
+		if IsPodFinished(testcase.pod) != testcase.expected {
+			t.Errorf("result is wrong: expected: %b", testcase.expected)
+		}
+	}
+}
