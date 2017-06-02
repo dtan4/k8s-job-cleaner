@@ -40,7 +40,7 @@ func TestIsJobFinished(t *testing.T) {
 
 	for _, testcase := range testcases {
 		if IsJobFinished(testcase.job) != testcase.expected {
-			t.Errorf("result is wrong: expected: %b", testcase.expected)
+			t.Errorf("wrong result: expected: %b", testcase.expected)
 		}
 	}
 }
@@ -90,7 +90,7 @@ func TestIsPodFinished(t *testing.T) {
 
 	for _, testcase := range testcases {
 		if IsPodFinished(testcase.pod) != testcase.expected {
-			t.Errorf("result is wrong: expected: %b", testcase.expected)
+			t.Errorf("wrong result: expected: %b", testcase.expected)
 		}
 	}
 }
